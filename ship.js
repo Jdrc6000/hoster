@@ -9,7 +9,7 @@
     left: '50%',
     width: '40px',
     height: '40px',
-    backgroundImage: 'url("https://yourdomain.com/spaceship.png")',
+    backgroundImage: 'url("https://en.wikipedia.org/wiki/File:Shrek_(character).png")',
     backgroundSize: 'contain',
     backgroundRepeat: 'no-repeat',
     zIndex: 9999,
