@@ -1,49 +1,33 @@
 (function() {
-  if (document.getElementById('spacecruiser-overlay')) return; // Prevent multiple instances
+  if (document.getElementById('spaceship')) return;
 
-  // Create the spaceship element
   const ship = document.createElement('div');
-  ship.id = 'spacecruiser-overlay';
-  Object.assign(ship.style, {
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    width: '40px',
-    height: '40px',
-    backgroundImage: 'url("https://en.wikipedia.org/wiki/File:Shrek_(character).png")',
-    backgroundSize: 'contain',
-    backgroundRepeat: 'no-repeat',
-    zIndex: 9999,
-    pointerEvents: 'none',
-    transform: 'translate(-50%, -50%)',
-  });
+  ship.id = 'spaceship';
+  ship.style.position = 'fixed';
+  ship.style.width = '60px';
+  ship.style.height = '60px';
+  ship.style.background = "url('https://upload.wikimedia.org/wikipedia/commons/4/4f/Pixel_spaceship.png') no-repeat center";
+  ship.style.backgroundSize = 'contain';
+  ship.style.top = '50%';
+  ship.style.left = '50%';
+  ship.style.transform = 'translate(-50%, -50%)';
+  ship.style.pointerEvents = 'none';
+  ship.style.zIndex = '999999';
   document.body.appendChild(ship);
 
-  // Movement variables
-  let posX = window.innerWidth / 2;
-  let posY = window.innerHeight / 2;
-  const speed = 5;
-  const keys = {};
+  let x = window.innerWidth / 2;
+  let y = window.innerHeight / 2;
+  const speed = 10;
 
-  // Update position
-  function moveShip() {
-    if (keys['ArrowUp']) posY -= speed;
-    if (keys['ArrowDown']) posY += speed;
-    if (keys['ArrowLeft']) posX -= speed;
-    if (keys['ArrowRight']) posX += speed;
-
-    // Boundary checks
-    posX = Math.max(0, Math.min(window.innerWidth, posX));
-    posY = Math.max(0, Math.min(window.innerHeight, posY));
-
-    ship.style.left = posX + 'px';
-    ship.style.top = posY + 'px';
-    requestAnimationFrame(moveShip);
-  }
-
-  // Key event listeners
-  window.addEventListener('keydown', (e) => keys[e.key] = true);
-  window.addEventListener('keyup', (e) => keys[e.key] = false);
-
-  moveShip();
+  window.addEventListener('keydown', (e) => {
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      e.preventDefault();
+      if (e.key === 'ArrowUp') y -= speed;
+      if (e.key === 'ArrowDown') y += speed;
+      if (e.key === 'ArrowLeft') x -= speed;
+      if (e.key === 'ArrowRight') x += speed;
+      ship.style.left = `${x}px`;
+      ship.style.top = `${y}px`;
+    }
+  });
 })();
