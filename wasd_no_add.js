@@ -830,7 +830,7 @@
             return !!getGlobalNamespace().KICKASS_SITE_KEY;
         },
         shouldShowAd: function() {
-            return !this.mySite && !this.isCampaign();
+            return false;
         },
         shouldShowMenu: function() {
             return !this.mySite && !this.isCampaign();
