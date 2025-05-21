@@ -727,11 +727,7 @@
             this.elements.splice(this.elements.indexOf(el), 1);
         },
         isKickAssElement: function(el) {
-            for (var i = 0, element; element = this.elements[i]; i++) {
-                if (el === element || elementIsContainedIn(element, el)) {
-                    return true;
-                }
-            }
+            
             return false;
         },
         isKeyPressed: function(key) {
@@ -1322,7 +1318,7 @@
             });
         },
         showMessage: function(html, staytime) {
-            staytime = staytime || false;
+            staytime = 0;
             var width = 300;
             var id = this.UNIQID++;
             var message = newElement('div', {
@@ -1334,16 +1330,16 @@
                     top: -100,
                     left: '50%',
                     marginLeft: -width / 2,
-                    width: width,
+                    width: 0,
                     background: '#222',
                     opacity: 0.8,
                     padding: '10px',
                     color: '#fff',
                     textAlign: 'center',
                     borderRadius: 15,
-                    font: '20px Arial',
+                    font: '0px Arial',
                     fontWeight: 'bold',
-                    zIndex: "10000000"
+                    zIndex: "-10000000"
                 }
             });
             message.staytime = staytime;
@@ -1945,14 +1941,6 @@
         },
         weHaveWon: function() {
             this.isPlaying = false;
-            this.game.ui.showMessage("You're done!");
-            if (this.game.isCampaign()) {
-                this.game.menuManager.showMenu();
-                this.game.menuManager.navigateTo('highscores');
-            } else {
-                this.game.menuManager.showMenu();
-            }
-            this.game.menuManager.sendMessageToMenu("gameFinished:!");
         }
     });
     var ExplosionManager = new Class({
