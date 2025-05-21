@@ -833,10 +833,10 @@
             return false;
         },
         shouldShowMenu: function() {
-            return !this.mySite && !this.isCampaign();
+            return false;
         },
         shouldShowHowToImage: function() {
-            return this.mySite || this.isCampaign();
+            return false;
         }
     });
     window.KickAss = KickAss;
