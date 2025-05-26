@@ -228,4 +228,3 @@ function gameLoop() {
 
 // Start the game
 gameLoop();
-})();
