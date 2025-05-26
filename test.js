@@ -6,7 +6,7 @@ Object.assign(canvas.style, {
     left: 0,
     zIndex: 9999,
     display: 'block',
-    background: 'radial-gradient(circle at center, #001122 0%, #000000 100%)'
+    background: 'transparent'
 });
 document.body.appendChild(canvas);
 
