@@ -134,50 +134,36 @@ function drawShip() {
     ctx.translate(ship.x, ship.y);
     ctx.rotate(ship.angle);
 
-    // Car body
-    ctx.fillStyle = '#ffffff';
+    const carLength = ship.size * 2;
+    const carWidth = ship.size;
+
+    // Draw car body
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(-carLength / 2, -carWidth / 2, carLength, carWidth);
+
+    // Draw wheels
+    const wheelOffsetX = carLength / 2 - 4;
+    const wheelOffsetY = carWidth / 2 + 2;
+    const wheelRadius = 3;
+
+    ctx.fillStyle = '#000000';
+    // Front wheels
     ctx.beginPath();
-    ctx.rect(-ship.size, -ship.size / 2, ship.size * 2, ship.size); // Main body
+    ctx.arc(-wheelOffsetX, -wheelOffsetY, wheelRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    // Spoiler
-    ctx.fillStyle = '#999999';
     ctx.beginPath();
-    ctx.rect(ship.size * 0.9, -ship.size / 2 - 2, 4, ship.size + 4);
+    ctx.arc(-wheelOffsetX, wheelOffsetY, wheelRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    // Wheels (front + back)
-    ctx.fillStyle = '#444444';
-    const wheelOffset = ship.size * 0.8;
-    ctx.beginPath(); // Front wheels
-    ctx.rect(-ship.size * 0.9, -ship.size / 2 - 3, 3, 6);
-    ctx.rect(-ship.size * 0.9, ship.size / 2 - 3, 3, 6);
-    ctx.fill();
-    ctx.beginPath(); // Rear wheels
-    ctx.rect(ship.size * 0.9 - 3, -ship.size / 2 - 3, 3, 6);
-    ctx.rect(ship.size * 0.9 - 3, ship.size / 2 - 3, 3, 6);
+    // Rear wheels
+    ctx.beginPath();
+    ctx.arc(wheelOffsetX, -wheelOffsetY, wheelRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    // Exhaust flames
-    if (keys.up) {
-        for (let side = -1; side <= 1; side += 2) {
-            ctx.beginPath();
-            ctx.moveTo(-ship.size - 2, side * 4);
-            ctx.lineTo(-ship.size - 10, side * 2);
-            ctx.lineTo(-ship.size - 12, side * 4);
-            ctx.closePath();
-            ctx.fillStyle = '#ff6600';
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(-ship.size - 2, side * 4);
-            ctx.lineTo(-ship.size - 8, side * 2);
-            ctx.lineTo(-ship.size - 10, side * 4);
-            ctx.closePath();
-            ctx.fillStyle = '#ffff00';
-            ctx.fill();
-        }
-    }
+    ctx.beginPath();
+    ctx.arc(wheelOffsetX, wheelOffsetY, wheelRadius, 0, Math.PI * 2);
+    ctx.fill();
 
     ctx.restore();
 }
