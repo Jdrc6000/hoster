@@ -27,8 +27,8 @@ const ship = {
     angle: -Math.PI / 2, // Start facing up
     velocityX: 0,
     velocityY: 0,
-    thrust: 0.2,
-    maxSpeed: 7,
+    thrust: 0.4,
+    maxSpeed: 8,
     rotationSpeed: 0.08,
     friction: 0.10,
     brakeForce: 0.95,
