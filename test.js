@@ -28,10 +28,10 @@ const ship = {
     velocityX: 0,
     velocityY: 0,
     thrust: 0.4,
-    maxSpeed: 8,
+    maxSpeed: 12,
     rotationSpeed: 0.08,
-    friction: 0.98,
-    brakeForce: 0.95,
+    friction: 0.95,
+    brakeForce: 0.9,
     size: 12
 };
 
@@ -133,91 +133,59 @@ function drawShip() {
     ctx.save();
     ctx.translate(ship.x, ship.y);
     ctx.rotate(ship.angle);
-    
-    // Ship body (triangle)
+
+    // Car body
+    ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.moveTo(ship.size, 0);
-    ctx.lineTo(-ship.size / 2, -ship.size / 2);
-    ctx.lineTo(-ship.size / 3, 0);
-    ctx.lineTo(-ship.size / 2, ship.size / 2);
-    ctx.closePath();
-    
-    // Fill ship
-    ctx.fillStyle = '#ffffff';
+    ctx.rect(-ship.size, -ship.size / 2, ship.size * 2, ship.size); // Main body
     ctx.fill();
-    
-    // Ship outline
-    ctx.strokeStyle = '#cccccc';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    
-    // Thrust flame when accelerating
+
+    // Spoiler
+    ctx.fillStyle = '#999999';
+    ctx.beginPath();
+    ctx.rect(ship.size * 0.9, -ship.size / 2 - 2, 4, ship.size + 4);
+    ctx.fill();
+
+    // Wheels (front + back)
+    ctx.fillStyle = '#444444';
+    const wheelOffset = ship.size * 0.8;
+    ctx.beginPath(); // Front wheels
+    ctx.rect(-ship.size * 0.9, -ship.size / 2 - 3, 3, 6);
+    ctx.rect(-ship.size * 0.9, ship.size / 2 - 3, 3, 6);
+    ctx.fill();
+    ctx.beginPath(); // Rear wheels
+    ctx.rect(ship.size * 0.9 - 3, -ship.size / 2 - 3, 3, 6);
+    ctx.rect(ship.size * 0.9 - 3, ship.size / 2 - 3, 3, 6);
+    ctx.fill();
+
+    // Exhaust flames
     if (keys.up) {
-        ctx.beginPath();
-        ctx.moveTo(-ship.size / 3, 0);
-        ctx.lineTo(-ship.size * 1.5, -3);
-        ctx.lineTo(-ship.size * 1.8, 0);
-        ctx.lineTo(-ship.size * 1.5, 3);
-        ctx.closePath();
-        
-        ctx.fillStyle = '#ff6600';
-        ctx.fill();
-        
-        // Inner flame
-        ctx.beginPath();
-        ctx.moveTo(-ship.size / 3, 0);
-        ctx.lineTo(-ship.size * 1.3, -2);
-        ctx.lineTo(-ship.size * 1.5, 0);
-        ctx.lineTo(-ship.size * 1.3, 2);
-        ctx.closePath();
-        
-        ctx.fillStyle = '#ffff00';
-        ctx.fill();
+        for (let side = -1; side <= 1; side += 2) {
+            ctx.beginPath();
+            ctx.moveTo(-ship.size - 2, side * 4);
+            ctx.lineTo(-ship.size - 10, side * 2);
+            ctx.lineTo(-ship.size - 12, side * 4);
+            ctx.closePath();
+            ctx.fillStyle = '#ff6600';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(-ship.size - 2, side * 4);
+            ctx.lineTo(-ship.size - 8, side * 2);
+            ctx.lineTo(-ship.size - 10, side * 4);
+            ctx.closePath();
+            ctx.fillStyle = '#ffff00';
+            ctx.fill();
+        }
     }
-    
+
     ctx.restore();
-}
-
-// Draw some stars for background
-const stars = [];
-for (let i = 0; i < 100; i++) {
-    stars.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        brightness: Math.random()
-    });
-}
-
-function drawStars() {
-    ctx.fillStyle = '#ffffff';
-    for (const star of stars) {
-        ctx.globalAlpha = star.brightness * 0.8;
-        ctx.fillRect(star.x, star.y, 1, 1);
-    }
-    ctx.globalAlpha = 1;
 }
 
 // Main game loop
 function gameLoop() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Update canvas size if window was resized
-    if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-        resizeCanvas();
-        // Regenerate stars for new canvas size
-        stars.length = 0;
-        for (let i = 0; i < 100; i++) {
-            stars.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                brightness: Math.random()
-            });
-        }
-    }
-    
-    // Draw background elements
-    drawStars();
     
     // Update and draw ship
     updateShip();
