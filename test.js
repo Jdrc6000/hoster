@@ -29,8 +29,8 @@ const ship = {
     velocityY: 0,
     thrust: 0.3,
     maxSpeed: 8,
-    rotationSpeed: 0.08,
-    friction: 0.98,
+    rotationSpeed: 0.03,
+    friction: 0.92,
     brakeForce: 0.95,
     size: 12
 };
