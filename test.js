@@ -133,38 +133,64 @@ function drawShip() {
     ctx.save();
     ctx.translate(ship.x, ship.y);
     ctx.rotate(ship.angle);
-
-    const carLength = ship.size * 2;
-    const carWidth = ship.size;
-
-    // Draw car body
-    ctx.fillStyle = '#ff0000';
-    ctx.fillRect(-carLength / 2, -carWidth / 2, carLength, carWidth);
-
-    // Draw wheels
-    const wheelOffsetX = carLength / 2 - 4;
-    const wheelOffsetY = carWidth / 2 + 2;
-    const wheelRadius = 3;
-
-    ctx.fillStyle = '#000000';
-    // Front wheels
+    
+    // Car body (main rectangle)
     ctx.beginPath();
-    ctx.arc(-wheelOffsetX, -wheelOffsetY, wheelRadius, 0, Math.PI * 2);
+    ctx.roundRect(-ship.size * 0.8, -ship.size * 0.4, ship.size * 1.6, ship.size * 0.8, 2);
+    ctx.fillStyle = '#cc0000';
     ctx.fill();
-
+    ctx.strokeStyle = '#990000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    // Front bumper
     ctx.beginPath();
-    ctx.arc(-wheelOffsetX, wheelOffsetY, wheelRadius, 0, Math.PI * 2);
+    ctx.roundRect(ship.size * 0.6, -ship.size * 0.25, ship.size * 0.3, ship.size * 0.5, 1);
+    ctx.fillStyle = '#aa0000';
     ctx.fill();
-
-    // Rear wheels
+    
+    // Windshield
     ctx.beginPath();
-    ctx.arc(wheelOffsetX, -wheelOffsetY, wheelRadius, 0, Math.PI * 2);
+    ctx.roundRect(-ship.size * 0.3, -ship.size * 0.25, ship.size * 0.6, ship.size * 0.5, 2);
+    ctx.fillStyle = '#4444ff';
     ctx.fill();
-
+    ctx.strokeStyle = '#333333';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    // Front tires
     ctx.beginPath();
-    ctx.arc(wheelOffsetX, wheelOffsetY, wheelRadius, 0, Math.PI * 2);
+    ctx.ellipse(ship.size * 0.5, -ship.size * 0.6, ship.size * 0.15, ship.size * 0.2, 0, 0, 2 * Math.PI);
+    ctx.fillStyle = '#222222';
     ctx.fill();
-
+    
+    ctx.beginPath();
+    ctx.ellipse(ship.size * 0.5, ship.size * 0.6, ship.size * 0.15, ship.size * 0.2, 0, 0, 2 * Math.PI);
+    ctx.fillStyle = '#222222';
+    ctx.fill();
+    
+    // Rear tires
+    ctx.beginPath();
+    ctx.ellipse(-ship.size * 0.5, -ship.size * 0.6, ship.size * 0.15, ship.size * 0.2, 0, 0, 2 * Math.PI);
+    ctx.fillStyle = '#222222';
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.ellipse(-ship.size * 0.5, ship.size * 0.6, ship.size * 0.15, ship.size * 0.2, 0, 0, 2 * Math.PI);
+    ctx.fillStyle = '#222222';
+    ctx.fill();
+    
+    // Racing stripes
+    ctx.beginPath();
+    ctx.rect(-ship.size * 0.6, -ship.size * 0.1, ship.size * 1.2, ship.size * 0.08);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.rect(-ship.size * 0.6, ship.size * 0.02, ship.size * 1.2, ship.size * 0.08);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    
     ctx.restore();
 }
 
