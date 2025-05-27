@@ -32,7 +32,7 @@ const ship = {
     rotationSpeed: 0.04,
     friction: 0.95,
     brakeForce: 0.9,
-    size: 12
+    size: 19
 };
 
 // Input handling
