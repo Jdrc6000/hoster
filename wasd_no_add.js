@@ -471,10 +471,10 @@
 
     function code(name) {
         var table = {
-            87: 'up',
-            83: 'down',
-            65: 'left',
-            68: 'right',
+            38: 'up',
+            40: 'down',
+            37: 'left',
+            39: 'right',
             27: 'esc'
         };
         if (table[name]) return table[name];
@@ -727,7 +727,11 @@
             this.elements.splice(this.elements.indexOf(el), 1);
         },
         isKickAssElement: function(el) {
-            
+            for (var i = 0, element; element = this.elements[i]; i++) {
+                if (el === element || elementIsContainedIn(element, el)) {
+                    return true;
+                }
+            }
             return false;
         },
         isKeyPressed: function(key) {
@@ -829,7 +833,7 @@
             return false;
         },
         shouldShowMenu: function() {
-            return false;
+            return !this.mySite && !this.isCampaign();
         },
         shouldShowHowToImage: function() {
             return false;
@@ -1044,19 +1048,145 @@
                 }
             this.hideBombMenu();
         },
-        create: function() {},
-        getShareHTML: function() {},
+        create: function() {
+            this.container = document.createElement('div');
+            this.container.className = 'KICKASSELEMENT KICKASShidden ' + (this.game.shouldShowMenu() ? "" : "KICKASSNOMENU");
+            this.container.id = 'kickass-menu';
+            if (this.game.shouldShowMenu()) {
+                this.container.style.bottom = '-250px';
+                this.container.style.display = 'none';
+            } else {
+                removeClass(this.container, "KICKASShidden");
+            }
+            getAppContainerElement().appendChild(this.container);
+            var adHTML = this.game.shouldShowAd() ? '<iframe style="background: transparent" src="' + GameGlobals.path('hello.html') + '" class="KICKASSELEMENT" id="kickass-hello-sunshine"></iframe>' : "";
+            this.container.innerHTML = '<div id="kickass-howto-image" class="KICKASSELEMENT kickass-howto-invisible"></div>' + '<div id="kickass-pointstab" class="KICKASSELEMENT">' +
+                adHTML + '<div id="kickass-bomb-menu" class="KICKASSELEMENT KICKASShidden">' + '<ul id="kickass-bomb-list" class="KICKASSELEMENT">' + '</ul>' + '</div>' + '<div id="kickass-weapons-menu" class="KICKASSELEMENT KICKASShidden" style="display:none">' + '<ul id="kickass-weapons-list" class="KICKASSELEMENT">' + '</ul>' + '</div>' + '<div id="kickass-pointstab-wrapper" class="KICKASSELEMENT">' + '<div id="kickass-points" class="KICKASSELEMENT">' +
+                this.numPoints + '</div>' + '<div id="kickass-esctoquit" class="KICKASSELEMENT">Press esc to quit</div>' +
+                this.getShareHTML() + '</div>' + '<ul id="kickass-pointstab-menu" class="KICKASSELEMENT" ' + (this.game.shouldShowMenu() ? '' : 'style="display:none"') + '>' + '<li class="KICKASSELEMENT"><a class="KICKASSELEMENT" id="kickass-link-highscores" href="#">Submit score</a></li>' + '<li class="KICKASSELEMENT"><a class="KICKASSELEMENT" id="kickass-link-menu" href="#">Menu</a></li>' + '<li class="last-li KICKASSELEMENT"><a class="KICKASSELEMENT" id="kickass-link-ships" href="#">Switch ship</a></li>' + '</ul>' + '</div>';
+            this.pointsTab = document.getElementById('kickass-pointstab');
+            this.pointsTabWrapper = document.getElementById('kickass-pointstab-wrapper');
+            this.points = document.getElementById('kickass-points');
+            this.escToQuit = document.getElementById('kickass-esctoquit');
+            this.howToImage = document.getElementById('kickass-howto-image');
+            this.weaponsMenu = document.getElementById('kickass-weapons-menu');
+            this.weaponsList = document.getElementById('kickass-weapons-list');
+            this.bombLink = document.getElementById('kickass-bomb-menu');
+            this.submitScoreLink = document.getElementById('kickass-link-highscores');
+            this.menuLink = document.getElementById('kickass-link-menu');
+            this.switchShipLink = document.getElementById('kickass-link-ships');
+            var all = this.container.getElementsByTagName('*');
+            for (var i = 0; i < all.length; i++) {
+                this.game.registerElement(all[i]);
+            }
+            this.game.registerElement(this.container);
+            if (this.game.shouldShowMenu()) {
+                this.menu = new Menu(this.game);
+                this.menu.parent = this;
+                this.menu.generate(this.container);
+            } else {
+                setTimeout(function() {
+                    this.onGameReady();
+                }.bind(this), 100);
+            }
+            addEvent(this.submitScoreLink, 'click', bind(this, function(e) {
+                stopEvent(e);
+                this.navigateTo('highscores');
+            }));
+            addEvent(this.menuLink, 'click', bind(this, function(e) {
+                stopEvent(e);
+                this.toggleMenu();
+                this.navigateTo('main', true);
+            }));
+            addEvent(this.switchShipLink, 'click', bind(this, function(e) {
+                stopEvent(e);
+                this.navigateTo('ships');
+            }));
+            addEvent(this.bombLink, 'click', bind(this, function(e) {
+                stopEvent(e);
+                this.game.fireBomb();
+            }));
+            addEvent(this.pointsTabWrapper, 'click', bind(this, this.toggleMenu));
+            addEvent(this.weaponsMenu, 'click', bind(this, this.toggleWeaponsMenu));
+            this.generateDefaults();
+        },
+        getShareHTML: function() {
+            if (typeof getGlobalNamespace().KICKASS_SHARE_URL !== "undefined") {
+                if (getGlobalNamespace().KICKASS_SHARE_URL) {
+                    var url = encodeURIComponent(getGlobalNamespace().KICKASS_SHARE_URL);
+                    return '<iframe class="KICKASSELEMENT kickass-like" src="//www.facebook.com/plugins/share_button.php?href=' + url + '&amp;send=false&amp;layout=button&amp;width=47&amp;show_faces=false&amp;action=like&amp;colorscheme=dark&amp;font=arial&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:80px; height:21px;" allowTransparency="true"></iframe>';
+                } else {
+                    return '';
+                }
+            } else {
+                var url = 'https://www.facebook.com/kickassapp';
+                if (this.game.mySite) {
+                    if (this.game.mySite.getShareURL()) {
+                        url = this.game.mySite.getShareURL();
+                    } else {
+                        return "";
+                    }
+                }
+                return '<iframe class="KICKASSELEMENT kickass-like" src="//www.facebook.com/plugins/like.php?href=' + encodeURIComponent(url) + '&amp;send=false&amp;layout=button_count&amp;width=47&amp;show_faces=false&amp;action=like&amp;colorscheme=dark&amp;font=arial&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:80px; height:21px;" allowTransparency="true"></iframe>';
+            }
+        },
         onGameReady: function() {
             this.container.style.display = 'block';
+            if (this.game.shouldShowHowToImage()) {
+                setTimeout(bind(this, function() {
+                    removeClass(this.howToImage, "kickass-howto-invisible");
+                }), 10);
+                setTimeout(bind(this, function() {
+                    addClass(this.howToImage, "kickass-howto-invisible");
+                }), 4000);
+            }
         },
-        navigateTo: function(page, dontShowMenu) {},
-        toggleMenu: function() {},
-        toggleWeaponsMenu: function() {},
-        hideWeaponsMenu: function() {},
-        showWeaponsMenu: function() {},
-        showMenu: function() {}
+        navigateTo: function(page, dontShowMenu) {
+            if (!dontShowMenu) {
+                this.showMenu();
+            }
+            if (this.menu) {
+                this.menu.socketPostMessage('navigate:!' + page);
+            }
         },
-        hideMenu: function() {},
+        toggleMenu: function() {
+            if (this.game.shouldShowMenu()) {
+                if (hasClass(this.container, 'KICKASShidden')) {
+                    this.showMenu();
+                } else {
+                    this.hideMenu();
+                }
+            } else {
+                this.showMenu();
+            }
+        },
+        toggleWeaponsMenu: function() {
+            if (hasClass(this.weaponsMenu, 'KICKASShidden')) {
+                this.showWeaponsMenu();
+            } else {
+                this.hideWeaponsMenu();
+            }
+        },
+        hideWeaponsMenu: function() {
+            this.weaponsMenu.style.width = '';
+            addClass(this.weaponsMenu, 'KICKASShidden');
+        },
+        showWeaponsMenu: function() {
+            var last = this.weaponsMenu.getElementsByTagName('li');
+            last = last[last.length - 1];
+            this.weaponsMenu.style.width = (last.offsetLeft + last.offsetWidth - 47) + 'px';
+            removeClass(this.weaponsMenu, 'KICKASShidden');
+        },
+        showMenu: function() {
+            if (this.game.shouldShowMenu()) {
+                this.container.style.bottom = '';
+                removeClass(this.container, 'KICKASShidden');
+            }
+        },
+        hideMenu: function() {
+            this.container.style.bottom = '';
+            addClass(this.container, 'KICKASShidden');
+        },
         showBombMenu: function() {
             this.bombLink.style.width = "";
         },
@@ -1192,7 +1322,7 @@
             });
         },
         showMessage: function(html, staytime) {
-            staytime = 0;
+            staytime = staytime || false;
             var width = 300;
             var id = this.UNIQID++;
             var message = newElement('div', {
@@ -1204,16 +1334,16 @@
                     top: -100,
                     left: '50%',
                     marginLeft: -width / 2,
-                    width: 0,
+                    width: width,
                     background: '#222',
                     opacity: 0.8,
                     padding: '10px',
                     color: '#fff',
                     textAlign: 'center',
                     borderRadius: 15,
-                    font: '0px Arial',
+                    font: '20px Arial',
                     fontWeight: 'bold',
-                    zIndex: "-10000000"
+                    zIndex: "10000000"
                 }
             });
             message.staytime = staytime;
@@ -1813,7 +1943,49 @@
                 this.weHaveWon();
             }
         },
-        weHaveWon: function() {}
+        weHaveWon: function() {
+            this.isPlaying = false;
+            this.game.ui.showMessage("You're done!");
+            if (this.game.isCampaign()) {
+                this.game.menuManager.showMenu();
+                this.game.menuManager.navigateTo('highscores');
+            } else {
+                this.game.menuManager.showMenu();
+            }
+            this.game.menuManager.sendMessageToMenu("gameFinished:!");
+        }
+    });
+    var ExplosionManager = new Class({
+        initialize: function(game) {
+            this.game = game;
+            this.explosions = [];
+        },
+        update: function(tdelta) {
+            var time = now();
+            for (var i = 0, explosion; explosion = this.explosions[i]; i++) {
+                if (time - explosion.bornAt > (explosion.ttl || 500)) {
+                    explosion.destroy();
+                    this.explosions.splice(i, 1);
+                    continue;
+                }
+                explosion.update(tdelta);
+            }
+        },
+        addExplosion: function(pos, forElement, explosionClass) {
+            explosionClass = explosionClass || ParticleExplosion;
+            var explosion = new explosionClass(pos, forElement);
+            explosion.game = this.game;
+            explosion.checkBounds();
+            this.explosions.push(explosion);
+            if (this.game.audioManager.explosion) {
+                this.game.audioManager.explosion.play();
+            }
+        },
+        destroy: function() {
+            for (var i = 0, explosion; explosion = this.explosions[i]; i++)
+                explosion.destroy();
+            this.explosions = [];
+        }
     });
     var Cannon = new Class({
         initialize: function(player, game, x, y, angle) {
@@ -2101,6 +2273,112 @@
         },
         destroy: function() {
             this.sheet.destroy();
+        }
+    });
+    var MegaParticleExplosion = new Class({
+        Extends: ParticleExplosion,
+        initialize: function(pos, element) {
+            Explosion.prototype.initialize.apply(this, arguments);
+            this.particleVel = new Vector(200, 0);
+            this.particles = [];
+            this.generateParticles();
+            this.sheet = new Sheet(new Rect(pos.x, pos.y, 500, 500));
+            this.ttl = 2000;
+            this.generationDelay = 0.6;
+            this.generationTimes = 2;
+            this.nextGenerate = this.generationDelay;
+        },
+        update: function(tdelta) {
+            this.nextGenerate -= tdelta;
+            if (this.nextGenerate <= 0 && this.generationTimes > 0) {
+                this.nextGenerate = this.generationDelay;
+                this.generateParticles();
+                this.generationTimes--;
+            }
+            ParticleExplosion.prototype.update.call(this, tdelta);
+        }
+    });
+    var SplitExplosion = new Class({
+        Extends: Explosion,
+        initialize: function(pos, element) {
+            if (!element) return;
+            Explosion.prototype.initialize.apply(this, arguments);
+            this.element = element;
+            this.fx = new Fx();
+            this.fx.addListener(this);
+            this.start();
+        },
+        update: function(tdelta) {
+            if (!this.element) return;
+            this.fx.update();
+        },
+        set: function(key, value) {
+            if (key == 'opacity') {}
+        },
+        start: function() {
+            var pieces = this.createClones();
+            var left = pieces[0],
+                right = pieces[1];
+            var lT = 'rotate(-' + random(30, 50) + 'deg) translate(-100px, 40px)';
+            var rT = 'rotate(' + random(30, 50) + 'deg) translate(100px, 40px)';
+            setStyles(left, {
+                'transform': lT
+            });
+            setStyles(right, {
+                'transform': rT
+            });
+            this.left = left;
+            this.right = right;
+            this.fx.add('opacity', {
+                start: 1,
+                end: 0.5,
+                duration: 500
+            });
+        },
+        createClones: function() {
+            var coords = getRect(this.element);
+            var leftContainer = this.createContainer(coords);
+            var rightContainer = this.createContainer(coords);
+            var left = cloneElement(this.element);
+            var right = cloneElement(this.element);
+            addClass(left, 'KICKASSELEMENT');
+            addClass(right, 'KICKASSELEMENT');
+            var styles = {
+                margin: 0,
+                overflow: 'hidden'
+            };
+            setStyles(left, styles);
+            setStyles(right, styles);
+            leftContainer.appendChild(left);
+            rightContainer.appendChild(right);
+            rightContainer.style.left = coords.left + coords.width / 2 + 'px';
+            rightContainer.scrollLeft += coords.width / 2;
+            this.element.style.opacity = 0;
+            this.element.style.visibility = 'hidden';
+            this.element.style.display = 'none';
+            return each([leftContainer, rightContainer], function(el) {
+                el.style.transition = 'transform 500ms ease-in';
+            });
+        },
+        createContainer: function(coords) {
+            var ret = document.createElement('div');
+            setStyles(ret, {
+                position: 'absolute',
+                left: coords.left,
+                top: coords.top,
+                width: coords.width * 0.5,
+                height: coords.height,
+                overflow: 'hidden'
+            });
+            getAppContainerElement().appendChild(ret);
+            return ret;
+        },
+        destroy: function() {
+            try {
+                this.left.parentNode.removeChild(this.left);
+                this.right.parentNode.removeChild(this.right);
+                this.element.parentNode.removeChild(this.element);
+            } catch (e) {}
         }
     });
     var Weapons = {
